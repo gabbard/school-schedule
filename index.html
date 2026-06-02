@@ -383,8 +383,11 @@
     document.getElementById('status-area').innerHTML = '<div class="loading">Fetching calendar…</div>';
 
     try {
-      const url = PROXY + encodeURIComponent(raw);
-      const res = await fetch(url);
+      const bust = () => `&_cb=${Date.now()}`;
+      const fetchFresh = (calUrl) =>
+        fetch(PROXY + encodeURIComponent(calUrl) + bust(), { cache: 'no-store' });
+
+      const res = await fetchFresh(raw);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       if (!text.includes('BEGIN:VCALENDAR')) throw new Error('The URL does not look like a valid iCal calendar.');
@@ -396,7 +399,7 @@
       clearInterval(refreshTimer);
       refreshTimer = setInterval(async () => {
         try {
-          const r2 = await fetch(PROXY + encodeURIComponent(raw));
+          const r2 = await fetchFresh(raw);
           if (r2.ok) { const t2 = await r2.text(); render(parseIcal(t2)); }
         } catch {}
       }, 5 * 60 * 1000);
