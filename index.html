@@ -388,7 +388,7 @@
 </div>
 
 <script>
-  const PROXY = 'https://corsproxy.io/?';
+  const PROXY = 'https://api.allorigins.win/raw?url=';
   const STORAGE_KEY  = 'school_schedule_url';
   const TEACHER_KEY  = 'school_schedule_teacher';
 
@@ -453,7 +453,7 @@
   const fetchFresh = (url) => {
     // Decode first to avoid double-encoding already-escaped characters (e.g. %40 → %2540)
     const normalized = encodeURIComponent(decodeURIComponent(url));
-    return fetch(PROXY + normalized + `&_cb=${Date.now()}`, { cache: 'no-store' });
+    return fetch(PROXY + normalized + `&_cb_=${Date.now()}`, { cache: 'no-store' });
   };
 
   // ── Mode toggle ────────────────────────────────────────
