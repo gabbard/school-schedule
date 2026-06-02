@@ -450,8 +450,11 @@
     return events.filter(ev => ev.start < e && ev.end > s).sort((a,b) => a.start - b.start);
   }
 
-  const fetchFresh = (url) =>
-    fetch(PROXY + encodeURIComponent(url) + `&_cb=${Date.now()}`, { cache: 'no-store' });
+  const fetchFresh = (url) => {
+    // Decode first to avoid double-encoding already-escaped characters (e.g. %40 → %2540)
+    const normalized = encodeURIComponent(decodeURIComponent(url));
+    return fetch(PROXY + normalized + `&_cb=${Date.now()}`, { cache: 'no-store' });
+  };
 
   // ── Mode toggle ────────────────────────────────────────
 
