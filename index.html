@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Schedule</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      color: #1a202c;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: #2b6cb0;
+    }
+
+    .subtitle {
+      color: #718096;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .setup-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+
+    .setup-card h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #4a5568;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus { border-color: #4299e1; }
+
+    button {
+      padding: 0.6rem 1.1rem;
+      background: #3182ce;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    button:hover { background: #2b6cb0; }
+    button:disabled { background: #a0aec0; cursor: not-allowed; }
+
+    .hint {
+      margin-top: 0.6rem;
+      font-size: 0.78rem;
+      color: #718096;
+      line-height: 1.4;
+    }
+
+    .hint a { color: #3182ce; }
+
+    #status-area {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .clock {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #718096;
+      margin-bottom: 1rem;
+    }
+
+    .clock span {
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+      margin-bottom: 0.4rem;
+    }
+
+    .card.now { border-left: 4px solid #48bb78; }
+    .card.now .card-label { color: #38a169; }
+
+    .card.next { border-left: 4px solid #4299e1; }
+    .card.next .card-label { color: #3182ce; }
+
+    .card.free { border-left: 4px solid #ed8936; }
+    .card.free .card-label { color: #dd6b20; }
+
+    .event-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+
+    .event-time {
+      font-size: 0.88rem;
+      color: #718096;
+    }
+
+    .progress-bar-wrap {
+      margin-top: 0.75rem;
+      background: #e2e8f0;
+      border-radius: 99px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #48bb78;
+      border-radius: 99px;
+      transition: width 1s linear;
+    }
+
+    .progress-label {
+      margin-top: 0.3rem;
+      font-size: 0.78rem;
+      color: #718096;
+    }
+
+    .today-list {
+      margin-top: 0.25rem;
+    }
+
+    .today-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid #f7fafc;
+      font-size: 0.88rem;
+    }
+
+    .today-item:last-child { border-bottom: none; }
+
+    .today-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #cbd5e0;
+    }
+
+    .today-item.past .today-dot { background: #a0aec0; }
+    .today-item.past { color: #a0aec0; }
+    .today-item.current .today-dot { background: #48bb78; }
+    .today-item.current { font-weight: 700; }
+    .today-item.upcoming .today-dot { background: #4299e1; }
+
+    .today-time { color: #718096; min-width: 110px; font-size: 0.82rem; }
+    .today-item.past .today-time { color: #cbd5e0; }
+
+    .error-msg {
+      background: #fff5f5;
+      border: 1px solid #feb2b2;
+      color: #c53030;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .loading {
+      text-align: center;
+      color: #718096;
+      padding: 1.5rem;
+    }
+
+    .no-events {
+      text-align: center;
+      color: #a0aec0;
+      padding: 1.5rem;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Student Schedule</h1>
+<p class="subtitle">See what you should be doing right now</p>
+
+<div class="setup-card">
+  <h2>Your Google Calendar (public iCal URL)</h2>
+  <div class="input-row">
+    <input type="text" id="cal-url" placeholder="https://calendar.google.com/calendar/ical/…/public/basic.ics" />
+    <button id="load-btn" onclick="loadCalendar()">Load</button>
+  </div>
+  <p class="hint">
+    In Google Calendar: Settings &rarr; pick a calendar &rarr; scroll to <em>Integrate calendar</em> &rarr; copy the <strong>Public address in iCal format</strong>.
+    <br>The calendar must be set to <strong>public</strong>.
+  </p>
+</div>
+
+<div id="status-area"></div>
+
+<script>
+  const PROXY = 'https://corsproxy.io/?';
+  const STORAGE_KEY = 'school_schedule_url';
+
+  let refreshTimer = null;
+  let clockTimer = null;
+
+  function fmt(d) {
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function parseICalDate(str) {
+    // Handles TZID=...: prefix and basic DATE-TIME / DATE values
+    const clean = str.includes(':') ? str.split(':').pop() : str;
+    if (clean.length === 8) {
+      // DATE only (YYYYMMDD) — treat as all-day, use local midnight
+      const y = clean.slice(0,4), mo = clean.slice(4,6), d = clean.slice(6,8);
+      return new Date(`${y}-${mo}-${d}T00:00:00`);
+    }
+    // DATE-TIME: YYYYMMDDTHHMMSS[Z]
+    const y = clean.slice(0,4), mo = clean.slice(4,6), d = clean.slice(6,8);
+    const h = clean.slice(9,11), mi = clean.slice(11,13), s = clean.slice(13,15);
+    const utc = clean.endsWith('Z');
+    if (utc) return new Date(`${y}-${mo}-${d}T${h}:${mi}:${s}Z`);
+    return new Date(`${y}-${mo}-${d}T${h}:${mi}:${s}`);
+  }
+
+  function parseIcal(text) {
+    const events = [];
+    const lines = text.replace(/\r\n /g, '').replace(/\r\n\t/g, '').split(/\r?\n/);
+    let ev = null;
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (line === 'BEGIN:VEVENT') { ev = {}; continue; }
+      if (line === 'END:VEVENT') {
+        if (ev && ev.start && ev.end && ev.title) events.push(ev);
+        ev = null;
+        continue;
+      }
+      if (!ev) continue;
+      if (line.startsWith('DTSTART')) ev.start = parseICalDate(line.split(':').slice(1).join(':'));
+      else if (line.startsWith('DTEND'))  ev.end   = parseICalDate(line.split(':').slice(1).join(':'));
+      else if (line.startsWith('SUMMARY:')) ev.title = line.slice(8).replace(/\\,/g, ',').replace(/\\n/g, '\n');
+      else if (line.startsWith('DESCRIPTION:')) ev.description = line.slice(12).replace(/\\,/g, ',').replace(/\\n/g, '\n');
+      else if (line.startsWith('LOCATION:')) ev.location = line.slice(9);
+    }
+    return events;
+  }
+
+  function todayEvents(events) {
+    const now = new Date();
+    const startOfDay = new Date(now); startOfDay.setHours(0,0,0,0);
+    const endOfDay   = new Date(now); endOfDay.setHours(23,59,59,999);
+    return events
+      .filter(e => e.start < endOfDay && e.end > startOfDay)
+      .sort((a,b) => a.start - b.start);
+  }
+
+  function render(events) {
+    const area = document.getElementById('status-area');
+    const now = new Date();
+    const todays = todayEvents(events);
+
+    const current = todays.find(e => e.start <= now && e.end > now);
+    const upcoming = todays.find(e => e.start > now);
+
+    let html = `<div class="clock">Right now: <span id="live-clock">${fmt(now)}</span></div>`;
+
+    if (current) {
+      const elapsed = now - current.start;
+      const total   = current.end - current.start;
+      const pct = Math.min(100, Math.round(elapsed / total * 100));
+      const remaining = Math.ceil((current.end - now) / 60000);
+      html += `
+        <div class="card now">
+          <div class="card-label">Happening Now</div>
+          <div class="event-title">${esc(current.title)}</div>
+          <div class="event-time">${fmt(current.start)} &ndash; ${fmt(current.end)}${current.location ? ' &bull; ' + esc(current.location) : ''}</div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+          <div class="progress-label">${pct}% done &bull; ${remaining} min left</div>
+        </div>`;
+    } else {
+      html += `<div class="card free"><div class="card-label">Right Now</div><div class="event-title">Free time</div></div>`;
+    }
+
+    if (upcoming) {
+      const minsUntil = Math.ceil((upcoming.start - now) / 60000);
+      html += `
+        <div class="card next">
+          <div class="card-label">Up Next &bull; in ${minsUntil} min</div>
+          <div class="event-title">${esc(upcoming.title)}</div>
+          <div class="event-time">${fmt(upcoming.start)} &ndash; ${fmt(upcoming.end)}${upcoming.location ? ' &bull; ' + esc(upcoming.location) : ''}</div>
+        </div>`;
+    }
+
+    if (todays.length === 0) {
+      html += `<div class="no-events">No events found for today.</div>`;
+    } else {
+      html += `<div class="card"><div class="card-label">Today&rsquo;s Full Schedule</div><div class="today-list">`;
+      for (const e of todays) {
+        let cls = 'upcoming';
+        if (e.end <= now) cls = 'past';
+        else if (e.start <= now) cls = 'current';
+        html += `<div class="today-item ${cls}">
+          <div class="today-dot"></div>
+          <div class="today-time">${fmt(e.start)} &ndash; ${fmt(e.end)}</div>
+          <div>${esc(e.title)}</div>
+        </div>`;
+      }
+      html += `</div></div>`;
+    }
+
+    area.innerHTML = html;
+
+    clearInterval(clockTimer);
+    clockTimer = setInterval(() => {
+      const el = document.getElementById('live-clock');
+      if (el) el.textContent = fmt(new Date());
+    }, 1000);
+  }
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  function showError(msg) {
+    document.getElementById('status-area').innerHTML = `<div class="error-msg">${msg}</div>`;
+  }
+
+  async function loadCalendar() {
+    const raw = document.getElementById('cal-url').value.trim();
+    if (!raw) { showError('Please paste your calendar URL first.'); return; }
+
+    const btn = document.getElementById('load-btn');
+    btn.disabled = true;
+    btn.textContent = 'Loading…';
+    document.getElementById('status-area').innerHTML = '<div class="loading">Fetching calendar…</div>';
+
+    try {
+      const url = PROXY + encodeURIComponent(raw);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      if (!text.includes('BEGIN:VCALENDAR')) throw new Error('The URL does not look like a valid iCal calendar.');
+
+      const events = parseIcal(text);
+      localStorage.setItem(STORAGE_KEY, raw);
+      render(events);
+
+      clearInterval(refreshTimer);
+      refreshTimer = setInterval(async () => {
+        try {
+          const r2 = await fetch(PROXY + encodeURIComponent(raw));
+          if (r2.ok) { const t2 = await r2.text(); render(parseIcal(t2)); }
+        } catch {}
+      }, 5 * 60 * 1000);
+    } catch (err) {
+      showError(`Could not load calendar: ${esc(err.message)}<br>Make sure the calendar is public and the URL ends in <code>.ics</code>.`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Load';
+    }
+  }
+
+  // Restore saved URL on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      document.getElementById('cal-url').value = saved;
+      loadCalendar();
+    }
+  });
+
+  // Allow pressing Enter in the input
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('cal-url').addEventListener('keydown', e => {
+      if (e.key === 'Enter') loadCalendar();
+    });
+  });
+</script>
+</body>
+</html>
