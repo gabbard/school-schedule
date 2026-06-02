@@ -453,7 +453,7 @@
   const fetchFresh = (url) => {
     // Decode first to avoid double-encoding already-escaped characters (e.g. %40 → %2540)
     const normalized = encodeURIComponent(decodeURIComponent(url));
-    return fetch(PROXY + normalized + `&_cb_=${Date.now()}`, { cache: 'no-store' });
+    return fetch(PROXY + normalized, { cache: 'no-store' });
   };
 
   // ── Mode toggle ────────────────────────────────────────
