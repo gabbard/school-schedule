@@ -341,7 +341,7 @@
 
   function parseIcal(text) {
     console.log(`[parseIcal] Parsing iCal text (${text.length} chars)`);
-    const events = [];
+    const raw_events = [];
     const lines = text.replace(/\r\n /g, '').replace(/\r\n\t/g, '').split(/\r?\n/);
     let ev = null;
     for (const raw of lines) {
@@ -349,7 +349,7 @@
       if (line === 'BEGIN:VEVENT') { ev = {}; continue; }
       if (line === 'END:VEVENT') {
         if (ev && ev.start && ev.end && ev.title) {
-          events.push(ev);
+          raw_events.push(ev);
         } else if (ev) {
           console.warn('[parseIcal] Skipping incomplete event (missing start, end, or title):', ev);
         }
@@ -361,7 +361,76 @@
       else if (line.startsWith('SUMMARY:'))     ev.title       = line.slice(8).replace(/\\,/g,',').replace(/\\n/g,'\n');
       else if (line.startsWith('DESCRIPTION:')) ev.description = line.slice(12).replace(/\\,/g,',').replace(/\\n/g,'\n');
       else if (line.startsWith('LOCATION:'))    ev.location    = line.slice(9);
+      else if (line.startsWith('RRULE:'))       ev.rrule       = line.slice(6);
+      else if (line.startsWith('EXDATE'))       ev.exdates     = [...(ev.exdates||[]), ...line.split(':').slice(1).join(':').split(',').map(parseICalDate)];
     }
+
+    const now = new Date();
+    const windowStart = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+    const windowEnd   = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+
+    const events = [];
+    for (const base of raw_events) {
+      if (!base.rrule) { events.push(base); continue; }
+
+      const duration = base.end - base.start;
+      const parts = Object.fromEntries(base.rrule.split(';').map(p => p.split('=')));
+      const freq     = parts.FREQ;
+      const interval = parseInt(parts.INTERVAL || '1', 10);
+      const until    = parts.UNTIL ? parseICalDate(parts.UNTIL) : null;
+      const count    = parts.COUNT ? parseInt(parts.COUNT, 10) : null;
+      const byDay    = parts.BYDAY ? parts.BYDAY.split(',') : null;
+
+      // day-of-week map for BYDAY
+      const DOW = {SU:0,MO:1,TU:2,WE:3,TH:4,FR:5,SA:6};
+
+      const isExcluded = (d) => (base.exdates||[]).some(ex =>
+        ex.getFullYear()===d.getFullYear() && ex.getMonth()===d.getMonth() && ex.getDate()===d.getDate()
+      );
+
+      let cursor = new Date(base.start);
+      let generated = 0;
+      const maxIter = 2000;
+      for (let iter = 0; iter < maxIter; iter++) {
+        if (until && cursor > until) break;
+        if (count !== null && generated >= count) break;
+        if (cursor > windowEnd) break;
+
+        const candidates = [];
+        if (byDay && (freq === 'WEEKLY' || freq === 'DAILY')) {
+          // emit one occurrence per matching weekday within this week anchor
+          const weekStart = new Date(cursor);
+          weekStart.setDate(cursor.getDate() - cursor.getDay()); // Sunday of cursor's week
+          for (const d of byDay) {
+            const dow = DOW[d.replace(/[+-]?\d*/g,'')];
+            if (dow === undefined) continue;
+            const date = new Date(weekStart);
+            date.setDate(weekStart.getDate() + dow);
+            date.setHours(cursor.getHours(), cursor.getMinutes(), cursor.getSeconds());
+            candidates.push(date);
+          }
+        } else {
+          candidates.push(new Date(cursor));
+        }
+
+        for (const c of candidates) {
+          if (until && c > until) continue;
+          if (count !== null && generated >= count) continue;
+          if (c < base.start) continue;
+          if (!isExcluded(c) && c >= windowStart && c <= windowEnd) {
+            events.push({...base, start: c, end: new Date(c.getTime() + duration)});
+          }
+          if (c >= base.start) generated++;
+        }
+
+        if (freq === 'DAILY')        cursor.setDate(cursor.getDate() + interval);
+        else if (freq === 'WEEKLY')  cursor.setDate(cursor.getDate() + 7 * interval);
+        else if (freq === 'MONTHLY') cursor.setMonth(cursor.getMonth() + interval);
+        else if (freq === 'YEARLY')  cursor.setFullYear(cursor.getFullYear() + interval);
+        else break;
+      }
+    }
+
     console.log(`[parseIcal] Found ${events.length} valid events:`, events);
     return events;
   }
