@@ -362,7 +362,7 @@
       else if (line.startsWith('DESCRIPTION:')) ev.description = line.slice(12).replace(/\\,/g,',').replace(/\\n/g,'\n');
       else if (line.startsWith('LOCATION:'))    ev.location    = line.slice(9);
     }
-    console.log(`[parseIcal] Found ${events.length} valid events`);
+    console.log(`[parseIcal] Found ${events.length} valid events:`, events);
     return events;
   }
 
