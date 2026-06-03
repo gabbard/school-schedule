@@ -364,7 +364,7 @@
     const now = new Date();
     const s = new Date(now); s.setHours(0,0,0,0);
     const e = new Date(now); e.setHours(23,59,59,999);
-    return events.filter(ev => ev.start < e && ev.end > s).sort((a,b) => a.start - b.start);
+    return events.filter(ev => ev.start >= s && ev.start <= e).sort((a,b) => a.start - b.start);
   }
 
   const fetchFresh = (url) => {
