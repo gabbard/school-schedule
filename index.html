@@ -405,6 +405,13 @@
   const STORAGE_KEY  = 'school_schedule_url';
   const TEACHER_KEY  = 'school_schedule_teacher';
 
+  const DEFAULT_STUDENTS = [
+    { name: 'Thomas',   url: 'https://calendar.google.com/calendar/ical/87018e330d56d74aa96c5646039fbf377f54f691bcde545f1f2a11e6b1826751%40group.calendar.google.com/public/basic.ics' },
+    { name: 'Nicholas', url: 'https://calendar.google.com/calendar/ical/87018e330d56d74aa96c5646039fbf377f54f691bcde545f1f2a11e6b1826751%40group.calendar.google.com/public/basic.ics' },
+    { name: 'Beatrice', url: 'https://calendar.google.com/calendar/ical/87018e330d56d74aa96c5646039fbf377f54f691bcde545f1f2a11e6b1826751%40group.calendar.google.com/public/basic.ics' },
+    { name: 'James',    url: 'https://calendar.google.com/calendar/ical/87018e330d56d74aa96c5646039fbf377f54f691bcde545f1f2a11e6b1826751%40group.calendar.google.com/public/basic.ics' },
+  ];
+
   let studentRefreshTimer = null;
   let studentClockTimer   = null;
   let teacherRefreshTimer = null;
@@ -700,29 +707,25 @@
   // ── Init ───────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', () => {
-    // Student view
-    const savedUrl = localStorage.getItem(STORAGE_KEY);
-    if (savedUrl) {
-      document.getElementById('cal-url').value = savedUrl;
-      studentLoad();
-    }
+    // Start in teacher view
+    setMode('teacher');
 
-    // Teacher view — restore saved students
+    // Student view — restore saved URL
+    const savedUrl = localStorage.getItem(STORAGE_KEY);
+    if (savedUrl) document.getElementById('cal-url').value = savedUrl;
+
+    // Teacher view — restore saved students or fall back to defaults
     const savedTeacher = localStorage.getItem(TEACHER_KEY);
+    let entries = DEFAULT_STUDENTS;
     if (savedTeacher) {
-      try {
-        const entries = JSON.parse(savedTeacher);
-        entries.forEach(e => addStudentEntry(e.name, e.url));
-      } catch {}
-    } else {
-      addStudentEntry(); // start with one blank row
+      try { entries = JSON.parse(savedTeacher); } catch {}
     }
+    entries.forEach(e => addStudentEntry(e.name, e.url));
+    teacherLoad();
 
     document.getElementById('cal-url').addEventListener('keydown', e => {
       if (e.key === 'Enter') studentLoad();
     });
-
-    startTeacherClock();
   });
 </script>
 </body>
