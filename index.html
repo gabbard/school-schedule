@@ -331,6 +331,19 @@
     .tile-next-title { font-size: 0.88rem; font-weight: 600; color: #4a5568; }
     .tile-next-time  { font-size: 0.78rem; color: #a0aec0; }
 
+    .tile-schedule { margin-top: 0.85rem; border-top: 1px solid #e2e8f0; padding-top: 0.75rem; }
+    .tile-schedule-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #a0aec0; margin-bottom: 0.5rem; }
+    .tile-schedule-item { display: flex; gap: 0.5rem; align-items: center; padding: 0.3rem 0; font-size: 0.8rem; border-bottom: 1px solid #f7fafc; }
+    .tile-schedule-item:last-child { border-bottom: none; }
+    .tile-schedule-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .tile-schedule-item.past { color: #a0aec0; }
+    .tile-schedule-item.past .tile-schedule-dot { background: #cbd5e0; }
+    .tile-schedule-item.current { font-weight: 700; }
+    .tile-schedule-item.current .tile-schedule-dot { background: #48bb78; }
+    .tile-schedule-item.upcoming .tile-schedule-dot { background: #4299e1; }
+    .tile-schedule-time { min-width: 95px; color: #718096; font-size: 0.75rem; flex-shrink: 0; }
+    .tile-schedule-item.past .tile-schedule-time { color: #cbd5e0; }
+
     .tile-error { font-size: 0.82rem; color: #c53030; }
     .tile-loading { font-size: 0.82rem; color: #a0aec0; }
 
@@ -617,16 +630,20 @@
         body = `<div class="tile-label orange">Right Now</div><div class="tile-now">Free time</div>`;
       }
 
-      if (upcoming && !s.error) {
-        const minsUntil = Math.ceil((upcoming.start - now) / 60000);
-        body += `
-          <div class="tile-next-label" style="margin-top:0.5rem">Up next &bull; in ${minsUntil} min</div>
-          <div class="tile-next-title">${esc(upcoming.title)}</div>
-          <div class="tile-next-time">${fmt(upcoming.start)} &ndash; ${fmt(upcoming.end)}</div>`;
-      }
-
       if (todays && todays.length === 0 && !s.error) {
         body = `<div class="tile-loading">No events today.</div>`;
+      } else if (todays && !s.error) {
+        body += `<div class="tile-schedule">
+          <div class="tile-schedule-label">Today&rsquo;s Schedule</div>`;
+        for (const e of todays) {
+          const cls = e.end <= now ? 'past' : e.start <= now ? 'current' : 'upcoming';
+          body += `<div class="tile-schedule-item ${cls}">
+            <div class="tile-schedule-dot"></div>
+            <div class="tile-schedule-time">${fmt(e.start)} &ndash; ${fmt(e.end)}</div>
+            <div>${esc(e.title)}</div>
+          </div>`;
+        }
+        body += `</div>`;
       }
 
       return `<div class="student-tile">
