@@ -363,12 +363,12 @@
 <p class="subtitle">See what students should be doing right now</p>
 
 <div class="mode-toggle">
-  <button class="mode-btn active" id="btn-student" onclick="setMode('student')">Student View</button>
-  <button class="mode-btn" id="btn-teacher" onclick="setMode('teacher')">Teacher View</button>
+  <button class="mode-btn" id="btn-student" onclick="setMode('student')">Student View</button>
+  <button class="mode-btn active" id="btn-teacher" onclick="setMode('teacher')">Teacher View</button>
 </div>
 
 <!-- ══ STUDENT VIEW ══ -->
-<div id="student-view">
+<div id="student-view" class="hidden">
   <div class="setup-card">
     <h2>Your Google Calendar (public iCal URL)</h2>
     <div class="input-row">
@@ -384,7 +384,7 @@
 </div>
 
 <!-- ══ TEACHER VIEW ══ -->
-<div id="teacher-view" class="hidden">
+<div id="teacher-view">
   <div class="teacher-setup">
     <h2>Students</h2>
     <div id="student-entries"></div>
@@ -707,25 +707,19 @@
   // ── Init ───────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', () => {
-    // Start in teacher view
-    setMode('teacher');
-
     // Student view — restore saved URL
     const savedUrl = localStorage.getItem(STORAGE_KEY);
     if (savedUrl) document.getElementById('cal-url').value = savedUrl;
 
-    // Teacher view — restore saved students or fall back to defaults
-    const savedTeacher = localStorage.getItem(TEACHER_KEY);
-    let entries = DEFAULT_STUDENTS;
-    if (savedTeacher) {
-      try { entries = JSON.parse(savedTeacher); } catch {}
-    }
-    entries.forEach(e => addStudentEntry(e.name, e.url));
+    // Teacher view — always use the hardcoded defaults
+    DEFAULT_STUDENTS.forEach(e => addStudentEntry(e.name, e.url));
     teacherLoad();
 
     document.getElementById('cal-url').addEventListener('keydown', e => {
       if (e.key === 'Enter') studentLoad();
     });
+
+    startTeacherClock();
   });
 </script>
 </body>
