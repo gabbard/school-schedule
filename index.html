@@ -366,8 +366,8 @@
     }
 
     const now = new Date();
-    const windowStart = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-    const windowEnd   = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+    const windowStart = new Date(now); windowStart.setHours(0,0,0,0);
+    const windowEnd   = new Date(now); windowEnd.setHours(23,59,59,999);
 
     const events = [];
     for (const base of raw_events) {
