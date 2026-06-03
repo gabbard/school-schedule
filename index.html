@@ -27,239 +27,23 @@
 
     .subtitle {
       color: #718096;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
       font-size: 0.95rem;
     }
 
-    /* ── Mode toggle ── */
-    .mode-toggle {
-      display: flex;
-      background: white;
-      border-radius: 10px;
-      padding: 4px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-      margin-bottom: 1.75rem;
-    }
-
-    .mode-btn {
-      padding: 0.45rem 1.2rem;
-      border: none;
-      border-radius: 7px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: transparent;
-      color: #718096;
-      transition: background 0.15s, color 0.15s;
-    }
-
-    .mode-btn.active {
-      background: #3182ce;
-      color: white;
-    }
-
-    .mode-btn:hover:not(.active) { background: #f0f4f8; }
-
-    /* ── Setup card ── */
-    .setup-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      width: 100%;
-      max-width: 560px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin-bottom: 1.5rem;
-    }
-
-    .setup-card h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      color: #4a5568;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 0.6rem 0.85rem;
-      border: 1.5px solid #cbd5e0;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-
-    input[type="text"]:focus { border-color: #4299e1; }
-
-    button {
-      padding: 0.6rem 1.1rem;
-      background: #3182ce;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-
-    button:hover { background: #2b6cb0; }
-    button:disabled { background: #a0aec0; cursor: not-allowed; }
-
-    .btn-danger { background: #e53e3e; }
-    .btn-danger:hover { background: #c53030; }
-
-    .btn-ghost {
-      background: transparent;
-      color: #718096;
-      border: 1.5px solid #cbd5e0;
-    }
-    .btn-ghost:hover { background: #f7fafc; color: #4a5568; }
-
-    .hint {
-      margin-top: 0.6rem;
-      font-size: 0.78rem;
-      color: #718096;
-      line-height: 1.4;
-    }
-
-    /* ── Student view ── */
-    #student-view { width: 100%; max-width: 560px; }
-    #teacher-view { width: 100%; max-width: 1100px; }
-
     .hidden { display: none !important; }
 
-    /* ── Shared card styles ── */
-    .clock {
+    /* ── Teacher grid view ── */
+    #teacher-view { width: 100%; max-width: 1200px; }
+
+    .teacher-clock {
       text-align: center;
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: #718096;
       margin-bottom: 1rem;
     }
+    .teacher-clock span { font-weight: 700; color: #2d3748; }
 
-    .clock span { font-weight: 700; color: #2d3748; }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .card-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #a0aec0;
-      margin-bottom: 0.4rem;
-    }
-
-    .card.now { border-left: 4px solid #48bb78; }
-    .card.now .card-label { color: #38a169; }
-    .card.next { border-left: 4px solid #4299e1; }
-    .card.next .card-label { color: #3182ce; }
-    .card.free { border-left: 4px solid #ed8936; }
-    .card.free .card-label { color: #dd6b20; }
-
-    .event-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.2rem; }
-    .event-time  { font-size: 0.88rem; color: #718096; }
-
-    .progress-bar-wrap {
-      margin-top: 0.75rem;
-      background: #e2e8f0;
-      border-radius: 99px;
-      height: 6px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: #48bb78;
-      border-radius: 99px;
-      transition: width 1s linear;
-    }
-
-    .progress-label { margin-top: 0.3rem; font-size: 0.78rem; color: #718096; }
-
-    .today-list { margin-top: 0.25rem; }
-
-    .today-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.55rem 0;
-      border-bottom: 1px solid #f7fafc;
-      font-size: 0.88rem;
-    }
-
-    .today-item:last-child { border-bottom: none; }
-
-    .today-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: #cbd5e0; }
-    .today-item.past .today-dot { background: #a0aec0; }
-    .today-item.past { color: #a0aec0; }
-    .today-item.current .today-dot { background: #48bb78; }
-    .today-item.current { font-weight: 700; }
-    .today-item.upcoming .today-dot { background: #4299e1; }
-    .today-time { color: #718096; min-width: 110px; font-size: 0.82rem; }
-    .today-item.past .today-time { color: #cbd5e0; }
-
-    .error-msg {
-      background: #fff5f5;
-      border: 1px solid #feb2b2;
-      color: #c53030;
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-    }
-
-    .loading { text-align: center; color: #718096; padding: 1.5rem; }
-    .no-events { text-align: center; color: #a0aec0; padding: 1.5rem; font-size: 0.95rem; }
-
-    /* ── Teacher view ── */
-    .teacher-setup {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      width: 100%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin-bottom: 1.5rem;
-    }
-
-    .teacher-setup h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #4a5568;
-      margin-bottom: 1rem;
-    }
-
-    .student-entry {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      margin-bottom: 0.6rem;
-    }
-
-    .student-entry input.name-input {
-      width: 140px;
-      flex-shrink: 0;
-    }
-
-    .teacher-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    /* ── Teacher grid ── */
     #teacher-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -270,7 +54,6 @@
     @media (max-width: 900px) {
       #teacher-grid { grid-template-columns: repeat(2, 1fr); }
     }
-
     @media (max-width: 500px) {
       #teacher-grid { grid-template-columns: 1fr; }
     }
@@ -286,24 +69,19 @@
       padding: 0.75rem 1rem;
       background: #ebf8ff;
       border-bottom: 1px solid #bee3f8;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
     }
 
     .student-name {
       font-weight: 700;
       font-size: 0.95rem;
       color: #2b6cb0;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
+    .student-name:hover { color: #2c5282; }
 
     .student-tile-body { padding: 1rem; }
-
-    .tile-now {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.2rem;
-    }
 
     .tile-label {
       font-size: 0.7rem;
@@ -312,11 +90,10 @@
       letter-spacing: 0.07em;
       margin-bottom: 0.25rem;
     }
-
-    .tile-label.green { color: #38a169; }
+    .tile-label.green  { color: #38a169; }
     .tile-label.orange { color: #dd6b20; }
-    .tile-label.blue { color: #3182ce; }
 
+    .tile-now  { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
     .tile-time { font-size: 0.8rem; color: #718096; margin-bottom: 0.5rem; }
 
     .tile-progress-wrap {
@@ -326,25 +103,15 @@
       overflow: hidden;
       margin-bottom: 0.25rem;
     }
-
-    .tile-progress-fill {
-      height: 100%;
-      background: #48bb78;
-      border-radius: 99px;
-    }
-
+    .tile-progress-fill { height: 100%; background: #48bb78; border-radius: 99px; }
     .tile-pct { font-size: 0.75rem; color: #a0aec0; margin-bottom: 0.75rem; }
-
-    .tile-next-label { font-size: 0.72rem; color: #718096; margin-bottom: 0.15rem; }
-    .tile-next-title { font-size: 0.88rem; font-weight: 600; color: #4a5568; }
-    .tile-next-time  { font-size: 0.78rem; color: #a0aec0; }
 
     .tile-schedule { margin-top: 0.85rem; border-top: 1px solid #e2e8f0; padding-top: 0.75rem; }
     .tile-schedule-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #a0aec0; margin-bottom: 0.5rem; }
     .tile-schedule-item { display: flex; gap: 0.5rem; align-items: center; padding: 0.3rem 0; font-size: 0.8rem; border-bottom: 1px solid #f7fafc; }
     .tile-schedule-item:last-child { border-bottom: none; }
     .tile-schedule-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .tile-schedule-item.past { color: #a0aec0; }
+    .tile-schedule-item.past  { color: #a0aec0; }
     .tile-schedule-item.past .tile-schedule-dot { background: #cbd5e0; }
     .tile-schedule-item.current { font-weight: 700; }
     .tile-schedule-item.current .tile-schedule-dot { background: #48bb78; }
@@ -352,17 +119,105 @@
     .tile-schedule-time { min-width: 95px; color: #718096; font-size: 0.75rem; flex-shrink: 0; }
     .tile-schedule-item.past .tile-schedule-time { color: #cbd5e0; }
 
-    .tile-error { font-size: 0.82rem; color: #c53030; }
+    .tile-error   { font-size: 0.82rem; color: #c53030; }
     .tile-loading { font-size: 0.82rem; color: #a0aec0; }
 
-    .teacher-clock {
+    /* ── Student detail view ── */
+    #detail-view { width: 100%; max-width: 560px; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: white;
+      border: 1.5px solid #cbd5e0;
+      color: #4a5568;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 1.25rem;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #f0f4f8; }
+
+    .detail-student-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #2b6cb0;
+      margin-bottom: 1rem;
       text-align: center;
-      font-size: 1rem;
+    }
+
+    .clock {
+      text-align: center;
+      font-size: 1.1rem;
       color: #718096;
       margin-bottom: 1rem;
     }
+    .clock span { font-weight: 700; color: #2d3748; }
 
-    .teacher-clock span { font-weight: 700; color: #2d3748; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .card-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+      margin-bottom: 0.4rem;
+    }
+    .card.now  { border-left: 4px solid #48bb78; }
+    .card.now  .card-label { color: #38a169; }
+    .card.next { border-left: 4px solid #4299e1; }
+    .card.next .card-label { color: #3182ce; }
+    .card.free { border-left: 4px solid #ed8936; }
+    .card.free .card-label { color: #dd6b20; }
+
+    .event-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .event-time  { font-size: 0.88rem; color: #718096; }
+
+    .progress-bar-wrap {
+      margin-top: 0.75rem;
+      background: #e2e8f0;
+      border-radius: 99px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #48bb78;
+      border-radius: 99px;
+      transition: width 1s linear;
+    }
+    .progress-label { margin-top: 0.3rem; font-size: 0.78rem; color: #718096; }
+
+    .today-list { margin-top: 0.25rem; }
+    .today-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid #f7fafc;
+      font-size: 0.88rem;
+    }
+    .today-item:last-child { border-bottom: none; }
+    .today-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: #cbd5e0; }
+    .today-item.past    { color: #a0aec0; }
+    .today-item.past .today-dot { background: #a0aec0; }
+    .today-item.current { font-weight: 700; }
+    .today-item.current .today-dot { background: #48bb78; }
+    .today-item.upcoming .today-dot { background: #4299e1; }
+    .today-time { color: #718096; min-width: 110px; font-size: 0.82rem; }
+    .today-item.past .today-time { color: #cbd5e0; }
+
+    .no-events { text-align: center; color: #a0aec0; padding: 1.5rem; font-size: 0.95rem; }
   </style>
 </head>
 <body>
@@ -370,48 +225,21 @@
 <h1>Student Schedule</h1>
 <p class="subtitle">See what students should be doing right now</p>
 
-<div class="mode-toggle">
-  <button class="mode-btn" id="btn-student" onclick="setMode('student')">Student View</button>
-  <button class="mode-btn active" id="btn-teacher" onclick="setMode('teacher')">Teacher View</button>
-</div>
-
-<!-- ══ STUDENT VIEW ══ -->
-<div id="student-view" class="hidden">
-  <div class="setup-card">
-    <h2>Your Google Calendar (public iCal URL)</h2>
-    <div class="input-row">
-      <input type="text" id="cal-url" placeholder="https://calendar.google.com/calendar/ical/…/public/basic.ics" />
-      <button id="load-btn" onclick="studentLoad()">Load</button>
-    </div>
-    <p class="hint">
-      In Google Calendar: Settings &rarr; pick a calendar &rarr; scroll to <em>Integrate calendar</em> &rarr; copy the <strong>Public address in iCal format</strong>.
-      <br>The calendar must be set to <strong>public</strong>.
-    </p>
-  </div>
-  <div id="student-status"></div>
-</div>
-
-<!-- ══ TEACHER VIEW ══ -->
+<!-- ══ TEACHER GRID VIEW ══ -->
 <div id="teacher-view">
-  <div class="teacher-setup">
-    <h2>Students</h2>
-    <div id="student-entries"></div>
-    <div class="teacher-actions">
-      <button class="btn-ghost" onclick="addStudentEntry()">+ Add Student</button>
-      <button onclick="teacherLoad()">Load All Schedules</button>
-    </div>
-    <p class="hint" style="margin-top:0.75rem">
-      Enter each student's name and their public Google Calendar iCal URL, then click <strong>Load All Schedules</strong>.
-    </p>
-  </div>
   <div class="teacher-clock">Right now: <span id="teacher-clock-time"></span></div>
   <div id="teacher-grid"></div>
 </div>
 
+<!-- ══ STUDENT DETAIL VIEW ══ -->
+<div id="detail-view" class="hidden">
+  <button class="back-btn" onclick="showTeacherView()">&#8592; All Students</button>
+  <div id="detail-name" class="detail-student-name"></div>
+  <div id="detail-status"></div>
+</div>
+
 <script>
   const PROXY = 'https://api.allorigins.win/raw?url=';
-  const STORAGE_KEY  = 'school_schedule_url';
-  const TEACHER_KEY  = 'school_schedule_teacher';
 
   const DEFAULT_STUDENTS = [
     { name: 'Thomas',   url: 'https://calendar.google.com/calendar/ical/87018e330d56d74aa96c5646039fbf377f54f691bcde545f1f2a11e6b1826751%40group.calendar.google.com/public/basic.ics' },
@@ -420,11 +248,12 @@
     { name: 'James',    url: 'https://calendar.google.com/calendar/ical/87018e330d56d74aa96c5646039fbf377f54f691bcde545f1f2a11e6b1826751%40group.calendar.google.com/public/basic.ics' },
   ];
 
-  let studentRefreshTimer = null;
-  let studentClockTimer   = null;
+  let teacherStudents     = [];
   let teacherRefreshTimer = null;
   let teacherClockTimer   = null;
-  let teacherStudents     = []; // [{name, url, events}]
+  let detailClockTimer    = null;
+  let detailRefreshTimer  = null;
+  let currentDetailIdx    = null;
 
   // ── Utilities ──────────────────────────────────────────
 
@@ -463,7 +292,7 @@
       }
       if (!ev) continue;
       if (line.startsWith('DTSTART')) ev.start = parseICalDate(line.split(':').slice(1).join(':'));
-      else if (line.startsWith('DTEND'))   ev.end   = parseICalDate(line.split(':').slice(1).join(':'));
+      else if (line.startsWith('DTEND'))        ev.end         = parseICalDate(line.split(':').slice(1).join(':'));
       else if (line.startsWith('SUMMARY:'))     ev.title       = line.slice(8).replace(/\\,/g,',').replace(/\\n/g,'\n');
       else if (line.startsWith('DESCRIPTION:')) ev.description = line.slice(12).replace(/\\,/g,',').replace(/\\n/g,'\n');
       else if (line.startsWith('LOCATION:'))    ev.location    = line.slice(9);
@@ -479,32 +308,109 @@
   }
 
   const fetchFresh = (url) => {
-    // Decode first to avoid double-encoding already-escaped characters (e.g. %40 → %2540)
     const normalized = encodeURIComponent(decodeURIComponent(url));
     return fetch(PROXY + normalized, { cache: 'no-store' });
   };
 
-  // ── Mode toggle ────────────────────────────────────────
-
-  function setMode(mode) {
-    document.getElementById('student-view').classList.toggle('hidden', mode !== 'student');
-    document.getElementById('teacher-view').classList.toggle('hidden', mode !== 'teacher');
-    document.getElementById('btn-student').classList.toggle('active', mode === 'student');
-    document.getElementById('btn-teacher').classList.toggle('active', mode === 'teacher');
-    if (mode === 'teacher') startTeacherClock();
-    else clearInterval(teacherClockTimer);
+  async function fetchWithRetry(url, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const res = await fetchFresh(url);
+        if (res.ok) return res;
+      } catch {}
+      if (i < retries - 1) await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+    }
+    throw new Error('Failed to fetch after retries');
   }
 
-  // ── Student view ───────────────────────────────────────
+  // ── Teacher grid ───────────────────────────────────────
 
-  function renderStudent(events) {
-    const area = document.getElementById('student-status');
+  function renderTeacherGrid() {
+    const grid = document.getElementById('teacher-grid');
+    const now  = new Date();
+
+    grid.innerHTML = teacherStudents.map((s, i) => {
+      const todays  = s.events ? todayEvents(s.events) : null;
+      const current = todays && todays.find(e => e.start <= now && e.end > now);
+
+      let body = '';
+      if (s.error) {
+        body = `<div class="tile-error">Could not load: ${esc(s.error)}</div>`;
+      } else if (!todays) {
+        body = `<div class="tile-loading">Loading…</div>`;
+      } else if (current) {
+        const pct = Math.min(100, Math.round((now - current.start) / (current.end - current.start) * 100));
+        const remaining = Math.ceil((current.end - now) / 60000);
+        body = `
+          <div class="tile-label green">Happening Now</div>
+          <div class="tile-now">${esc(current.title)}</div>
+          <div class="tile-time">${fmt(current.start)} &ndash; ${fmt(current.end)}${current.location ? ' &bull; ' + esc(current.location) : ''}</div>
+          <div class="tile-progress-wrap"><div class="tile-progress-fill" style="width:${pct}%"></div></div>
+          <div class="tile-pct">${pct}% done &bull; ${remaining} min left</div>`;
+      } else {
+        body = `<div class="tile-label orange">Right Now</div><div class="tile-now">Free time</div>`;
+      }
+
+      if (todays && todays.length === 0 && !s.error) {
+        body = `<div class="tile-loading">No events today.</div>`;
+      } else if (todays && !s.error) {
+        body += `<div class="tile-schedule"><div class="tile-schedule-label">Today&rsquo;s Schedule</div>`;
+        for (const e of todays) {
+          const cls = e.end <= now ? 'past' : e.start <= now ? 'current' : 'upcoming';
+          body += `<div class="tile-schedule-item ${cls}">
+            <div class="tile-schedule-dot"></div>
+            <div class="tile-schedule-time">${fmt(e.start)} &ndash; ${fmt(e.end)}</div>
+            <div>${esc(e.title)}</div>
+          </div>`;
+        }
+        body += `</div>`;
+      }
+
+      return `<div class="student-tile">
+        <div class="student-tile-header">
+          <span class="student-name" onclick="showDetailView(${i})">${esc(s.name)}</span>
+        </div>
+        <div class="student-tile-body">${body}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function startTeacherClock() {
+    const update = () => {
+      const el = document.getElementById('teacher-clock-time');
+      if (el) el.textContent = fmt(new Date());
+    };
+    update();
+    clearInterval(teacherClockTimer);
+    teacherClockTimer = setInterval(update, 1000);
+  }
+
+  async function fetchAllStudents() {
+    const urlCache = {};
+    await Promise.all(teacherStudents.map(async (s, i) => {
+      try {
+        if (!urlCache[s.url]) urlCache[s.url] = fetchWithRetry(s.url).then(r => r.text());
+        const text = await urlCache[s.url];
+        if (!text.includes('BEGIN:VCALENDAR')) throw new Error('Not a valid iCal URL');
+        teacherStudents[i].events = parseIcal(text);
+        teacherStudents[i].error  = null;
+      } catch (err) {
+        teacherStudents[i].error = err.message;
+      }
+      renderTeacherGrid();
+    }));
+  }
+
+  // ── Student detail view ────────────────────────────────
+
+  function renderDetail(idx) {
+    const s = teacherStudents[idx];
     const now = new Date();
-    const todays = todayEvents(events);
+    const todays  = s.events ? todayEvents(s.events) : [];
     const current  = todays.find(e => e.start <= now && e.end > now);
     const upcoming = todays.find(e => e.start > now);
 
-    let html = `<div class="clock">Right now: <span id="live-clock">${fmt(now)}</span></div>`;
+    let html = `<div class="clock">Right now: <span id="detail-clock">${fmt(now)}</span></div>`;
 
     if (current) {
       const pct = Math.min(100, Math.round((now - current.start) / (current.end - current.start) * 100));
@@ -534,7 +440,7 @@
     } else {
       html += `<div class="card"><div class="card-label">Today&rsquo;s Full Schedule</div><div class="today-list">`;
       for (const e of todays) {
-        let cls = e.end <= now ? 'past' : e.start <= now ? 'current' : 'upcoming';
+        const cls = e.end <= now ? 'past' : e.start <= now ? 'current' : 'upcoming';
         html += `<div class="today-item ${cls}">
           <div class="today-dot"></div>
           <div class="today-time">${fmt(e.start)} &ndash; ${fmt(e.end)}</div>
@@ -544,195 +450,47 @@
       html += `</div></div>`;
     }
 
-    area.innerHTML = html;
-    clearInterval(studentClockTimer);
-    studentClockTimer = setInterval(() => {
-      const el = document.getElementById('live-clock');
+    document.getElementById('detail-status').innerHTML = html;
+
+    clearInterval(detailClockTimer);
+    detailClockTimer = setInterval(() => {
+      const el = document.getElementById('detail-clock');
       if (el) el.textContent = fmt(new Date());
     }, 1000);
   }
 
-  async function studentLoad() {
-    const raw = document.getElementById('cal-url').value.trim();
-    if (!raw) {
-      document.getElementById('student-status').innerHTML = `<div class="error-msg">Please paste your calendar URL first.</div>`;
-      return;
-    }
-    const btn = document.getElementById('load-btn');
-    btn.disabled = true; btn.textContent = 'Loading…';
-    document.getElementById('student-status').innerHTML = '<div class="loading">Fetching calendar…</div>';
+  function showDetailView(idx) {
+    currentDetailIdx = idx;
+    document.getElementById('teacher-view').classList.add('hidden');
+    document.getElementById('detail-view').classList.remove('hidden');
+    document.getElementById('detail-name').textContent = teacherStudents[idx].name;
+    renderDetail(idx);
 
-    try {
-      const res = await fetchFresh(raw);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      if (!text.includes('BEGIN:VCALENDAR')) throw new Error('The URL does not look like a valid iCal calendar.');
-      const events = parseIcal(text);
-      localStorage.setItem(STORAGE_KEY, raw);
-      renderStudent(events);
-
-      clearInterval(studentRefreshTimer);
-      studentRefreshTimer = setInterval(async () => {
-        try {
-          const r2 = await fetchFresh(raw);
-          if (r2.ok) renderStudent(parseIcal(await r2.text()));
-        } catch {}
-      }, 5 * 60 * 1000);
-    } catch (err) {
-      document.getElementById('student-status').innerHTML =
-        `<div class="error-msg">Could not load calendar: ${esc(err.message)}<br>Make sure the calendar is public and the URL ends in <code>.ics</code>.</div>`;
-    } finally {
-      btn.disabled = false; btn.textContent = 'Load';
-    }
+    clearInterval(detailRefreshTimer);
+    detailRefreshTimer = setInterval(() => renderDetail(currentDetailIdx), 60000);
   }
 
-  // ── Teacher view ───────────────────────────────────────
-
-  function startTeacherClock() {
-    const update = () => {
-      const el = document.getElementById('teacher-clock-time');
-      if (el) el.textContent = fmt(new Date());
-    };
-    update();
-    clearInterval(teacherClockTimer);
-    teacherClockTimer = setInterval(update, 1000);
-  }
-
-  function addStudentEntry(name = '', url = '') {
-    const container = document.getElementById('student-entries');
-    const idx = container.children.length;
-    const div = document.createElement('div');
-    div.className = 'student-entry';
-    div.innerHTML = `
-      <input type="text" class="name-input" placeholder="Student name" value="${esc(name)}" />
-      <input type="text" placeholder="https://calendar.google.com/calendar/ical/…/public/basic.ics" value="${esc(url)}" />
-      <button class="btn-danger" style="padding:0.6rem 0.75rem" onclick="this.closest('.student-entry').remove()">✕</button>
-    `;
-    container.appendChild(div);
-  }
-
-  function getStudentEntries() {
-    return Array.from(document.querySelectorAll('.student-entry')).map(row => ({
-      name: row.querySelector('.name-input').value.trim() || 'Student',
-      url:  row.querySelectorAll('input')[1].value.trim(),
-    })).filter(s => s.url);
-  }
-
-  function renderTeacherGrid() {
-    const grid = document.getElementById('teacher-grid');
-    const now  = new Date();
-
-    grid.innerHTML = teacherStudents.map((s, i) => {
-      const todays  = s.events ? todayEvents(s.events) : null;
-      const current  = todays && todays.find(e => e.start <= now && e.end > now);
-      const upcoming = todays && todays.find(e => e.start > now);
-
-      let body = '';
-      if (s.error) {
-        body = `<div class="tile-error">Could not load: ${esc(s.error)}</div>`;
-      } else if (!todays) {
-        body = `<div class="tile-loading">Loading…</div>`;
-      } else if (current) {
-        const pct = Math.min(100, Math.round((now - current.start) / (current.end - current.start) * 100));
-        const remaining = Math.ceil((current.end - now) / 60000);
-        body = `
-          <div class="tile-label green">Happening Now</div>
-          <div class="tile-now">${esc(current.title)}</div>
-          <div class="tile-time">${fmt(current.start)} &ndash; ${fmt(current.end)}${current.location ? ' &bull; ' + esc(current.location) : ''}</div>
-          <div class="tile-progress-wrap"><div class="tile-progress-fill" style="width:${pct}%"></div></div>
-          <div class="tile-pct">${pct}% done &bull; ${remaining} min left</div>`;
-      } else {
-        body = `<div class="tile-label orange">Right Now</div><div class="tile-now">Free time</div>`;
-      }
-
-      if (todays && todays.length === 0 && !s.error) {
-        body = `<div class="tile-loading">No events today.</div>`;
-      } else if (todays && !s.error) {
-        body += `<div class="tile-schedule">
-          <div class="tile-schedule-label">Today&rsquo;s Schedule</div>`;
-        for (const e of todays) {
-          const cls = e.end <= now ? 'past' : e.start <= now ? 'current' : 'upcoming';
-          body += `<div class="tile-schedule-item ${cls}">
-            <div class="tile-schedule-dot"></div>
-            <div class="tile-schedule-time">${fmt(e.start)} &ndash; ${fmt(e.end)}</div>
-            <div>${esc(e.title)}</div>
-          </div>`;
-        }
-        body += `</div>`;
-      }
-
-      return `<div class="student-tile">
-        <div class="student-tile-header">
-          <span class="student-name">${esc(s.name)}</span>
-        </div>
-        <div class="student-tile-body">${body}</div>
-      </div>`;
-    }).join('');
-  }
-
-  async function fetchWithRetry(url, retries = 3) {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const res = await fetchFresh(url);
-        if (res.ok) return res;
-      } catch {}
-      if (i < retries - 1) await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-    }
-    throw new Error('Failed to fetch after retries');
-  }
-
-  async function fetchAllStudents() {
-    // Deduplicate URLs so the proxy isn't hit multiple times for the same calendar
-    const urlCache = {};
-    await Promise.all(teacherStudents.map(async (s, i) => {
-      try {
-        if (!urlCache[s.url]) urlCache[s.url] = fetchWithRetry(s.url).then(r => r.text());
-        const text = await urlCache[s.url];
-        if (!text.includes('BEGIN:VCALENDAR')) throw new Error('Not a valid iCal URL');
-        teacherStudents[i].events = parseIcal(text);
-        teacherStudents[i].error  = null;
-      } catch (err) {
-        teacherStudents[i].error = err.message;
-      }
-      renderTeacherGrid();
-    }));
-  }
-
-  async function teacherLoad() {
-    const entries = getStudentEntries();
-    if (entries.length === 0) {
-      document.getElementById('teacher-grid').innerHTML =
-        `<div class="error-msg" style="grid-column:1/-1">Add at least one student with a calendar URL.</div>`;
-      return;
-    }
-
-    teacherStudents = entries.map(e => ({ ...e, events: null, error: null }));
-    renderTeacherGrid();
-
-    await fetchAllStudents();
-
-    clearInterval(teacherRefreshTimer);
-    teacherRefreshTimer = setInterval(async () => {
-      await fetchAllStudents();
-    }, 5 * 60 * 1000);
+  function showTeacherView() {
+    currentDetailIdx = null;
+    clearInterval(detailClockTimer);
+    clearInterval(detailRefreshTimer);
+    document.getElementById('detail-view').classList.add('hidden');
+    document.getElementById('teacher-view').classList.remove('hidden');
   }
 
   // ── Init ───────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', () => {
-    // Student view — restore saved URL
-    const savedUrl = localStorage.getItem(STORAGE_KEY);
-    if (savedUrl) document.getElementById('cal-url').value = savedUrl;
-
-    // Teacher view — always use the hardcoded defaults
-    DEFAULT_STUDENTS.forEach(e => addStudentEntry(e.name, e.url));
-    teacherLoad();
-
-    document.getElementById('cal-url').addEventListener('keydown', e => {
-      if (e.key === 'Enter') studentLoad();
-    });
-
+    teacherStudents = DEFAULT_STUDENTS.map(e => ({ ...e, events: null, error: null }));
+    renderTeacherGrid();
+    fetchAllStudents();
     startTeacherClock();
+
+    clearInterval(teacherRefreshTimer);
+    teacherRefreshTimer = setInterval(async () => {
+      await fetchAllStudents();
+      if (currentDetailIdx !== null) renderDetail(currentDetailIdx);
+    }, 5 * 60 * 1000);
   });
 </script>
 </body>
