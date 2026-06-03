@@ -670,24 +670,24 @@
     }).join('');
   }
 
-  async function teacherLoad() {
-    const entries = getStudentEntries();
-    if (entries.length === 0) {
-      document.getElementById('teacher-grid').innerHTML =
-        `<div class="error-msg" style="grid-column:1/-1">Add at least one student with a calendar URL.</div>`;
-      return;
+  async function fetchWithRetry(url, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const res = await fetchFresh(url);
+        if (res.ok) return res;
+      } catch {}
+      if (i < retries - 1) await new Promise(r => setTimeout(r, 1000 * (i + 1)));
     }
+    throw new Error('Failed to fetch after retries');
+  }
 
-    localStorage.setItem(TEACHER_KEY, JSON.stringify(entries));
-
-    teacherStudents = entries.map(e => ({ ...e, events: null, error: null }));
-    renderTeacherGrid();
-
+  async function fetchAllStudents() {
+    // Deduplicate URLs so the proxy isn't hit multiple times for the same calendar
+    const urlCache = {};
     await Promise.all(teacherStudents.map(async (s, i) => {
       try {
-        const res = await fetchFresh(s.url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
+        if (!urlCache[s.url]) urlCache[s.url] = fetchWithRetry(s.url).then(r => r.text());
+        const text = await urlCache[s.url];
         if (!text.includes('BEGIN:VCALENDAR')) throw new Error('Not a valid iCal URL');
         teacherStudents[i].events = parseIcal(text);
         teacherStudents[i].error  = null;
@@ -696,19 +696,24 @@
       }
       renderTeacherGrid();
     }));
+  }
+
+  async function teacherLoad() {
+    const entries = getStudentEntries();
+    if (entries.length === 0) {
+      document.getElementById('teacher-grid').innerHTML =
+        `<div class="error-msg" style="grid-column:1/-1">Add at least one student with a calendar URL.</div>`;
+      return;
+    }
+
+    teacherStudents = entries.map(e => ({ ...e, events: null, error: null }));
+    renderTeacherGrid();
+
+    await fetchAllStudents();
 
     clearInterval(teacherRefreshTimer);
     teacherRefreshTimer = setInterval(async () => {
-      await Promise.all(teacherStudents.map(async (s, i) => {
-        try {
-          const r = await fetchFresh(s.url);
-          if (r.ok) {
-            teacherStudents[i].events = parseIcal(await r.text());
-            teacherStudents[i].error  = null;
-          }
-        } catch {}
-      }));
-      renderTeacherGrid();
+      await fetchAllStudents();
     }, 5 * 60 * 1000);
   }
 
