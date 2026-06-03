@@ -340,6 +340,7 @@
   }
 
   function parseIcal(text) {
+    console.log(`[parseIcal] Parsing iCal text (${text.length} chars)`);
     const events = [];
     const lines = text.replace(/\r\n /g, '').replace(/\r\n\t/g, '').split(/\r?\n/);
     let ev = null;
@@ -347,7 +348,11 @@
       const line = raw.trim();
       if (line === 'BEGIN:VEVENT') { ev = {}; continue; }
       if (line === 'END:VEVENT') {
-        if (ev && ev.start && ev.end && ev.title) events.push(ev);
+        if (ev && ev.start && ev.end && ev.title) {
+          events.push(ev);
+        } else if (ev) {
+          console.warn('[parseIcal] Skipping incomplete event (missing start, end, or title):', ev);
+        }
         ev = null; continue;
       }
       if (!ev) continue;
@@ -357,6 +362,7 @@
       else if (line.startsWith('DESCRIPTION:')) ev.description = line.slice(12).replace(/\\,/g,',').replace(/\\n/g,'\n');
       else if (line.startsWith('LOCATION:'))    ev.location    = line.slice(9);
     }
+    console.log(`[parseIcal] Found ${events.length} valid events`);
     return events;
   }
 
@@ -364,22 +370,40 @@
     const now = new Date();
     const s = new Date(now); s.setHours(0,0,0,0);
     const e = new Date(now); e.setHours(23,59,59,999);
-    return events.filter(ev => ev.start >= s && ev.start <= e).sort((a,b) => a.start - b.start);
+    const todays = events.filter(ev => ev.start >= s && ev.start <= e).sort((a,b) => a.start - b.start);
+    console.log(`[todayEvents] ${todays.length} of ${events.length} events fall on today (${now.toDateString()}):`,
+      todays.map(ev => `"${ev.title}" ${fmt(ev.start)}–${fmt(ev.end)}`));
+    return todays;
   }
 
   const fetchFresh = (url) => {
     const normalized = encodeURIComponent(decodeURIComponent(url));
-    return fetch(PROXY + normalized, { cache: 'no-store' });
+    const proxyUrl = PROXY + normalized;
+    console.debug('[fetchFresh] Requesting:', proxyUrl);
+    return fetch(proxyUrl, { cache: 'no-store' });
   };
 
   async function fetchWithRetry(url, retries = 6) {
     for (let i = 0; i < retries; i++) {
+      const attempt = i + 1;
+      console.log(`[fetchWithRetry] Attempt ${attempt}/${retries} for: ${url}`);
       try {
         const res = await fetchFresh(url);
-        if (res.ok) return res;
-      } catch {}
-      if (i < retries - 1) await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+        if (res.ok) {
+          console.log(`[fetchWithRetry] Success on attempt ${attempt} (HTTP ${res.status})`);
+          return res;
+        }
+        console.warn(`[fetchWithRetry] Attempt ${attempt} got HTTP ${res.status}`);
+      } catch (err) {
+        console.warn(`[fetchWithRetry] Attempt ${attempt} threw:`, err);
+      }
+      if (i < retries - 1) {
+        const delay = 1000 * Math.pow(2, i);
+        console.log(`[fetchWithRetry] Waiting ${delay / 1000}s before next attempt…`);
+        await new Promise(r => setTimeout(r, delay));
+      }
     }
+    console.error(`[fetchWithRetry] All ${retries} attempts failed for: ${url}`);
     throw new Error('Failed to fetch after retries');
   }
 
@@ -456,19 +480,30 @@
   }
 
   async function fetchAllStudents() {
+    console.log('[fetchAllStudents] Starting fetch for', teacherStudents.map(s => s.name));
     const urlCache = {};
     await Promise.all(teacherStudents.map(async (s, i) => {
+      console.log(`[fetchAllStudents] Fetching calendar for ${s.name}`);
       try {
-        if (!urlCache[s.url]) urlCache[s.url] = fetchWithRetry(s.url).then(r => r.text());
+        if (!urlCache[s.url]) {
+          console.log(`[fetchAllStudents] URL not cached, fetching: ${s.url}`);
+          urlCache[s.url] = fetchWithRetry(s.url).then(r => r.text());
+        } else {
+          console.log(`[fetchAllStudents] Reusing cached fetch for ${s.name}`);
+        }
         const text = await urlCache[s.url];
-        if (!text.includes('BEGIN:VCALENDAR')) throw new Error('Not a valid iCal URL');
+        console.log(`[fetchAllStudents] Got ${text.length} chars for ${s.name}`);
+        if (!text.includes('BEGIN:VCALENDAR')) throw new Error('Not a valid iCal URL — response did not contain BEGIN:VCALENDAR');
         teacherStudents[i].events = parseIcal(text);
         teacherStudents[i].error  = null;
+        console.log(`[fetchAllStudents] ✓ ${s.name} loaded with ${teacherStudents[i].events.length} total events`);
       } catch (err) {
+        console.error(`[fetchAllStudents] ✗ Failed to load ${s.name}:`, err);
         teacherStudents[i].error = err.message;
       }
       renderTeacherGrid();
     }));
+    console.log('[fetchAllStudents] Done');
   }
 
   // ── Student detail view ────────────────────────────────
@@ -550,6 +585,8 @@
   // ── Init ───────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', () => {
+    console.log('[init] Page loaded, starting St. John Henry Newman Schedule');
+
     // Restore dark mode preference
     if (localStorage.getItem('dark') === '1') {
       document.body.classList.add('dark');
@@ -557,6 +594,7 @@
     }
 
     teacherStudents = DEFAULT_STUDENTS.map(e => ({ ...e, events: null, error: null }));
+    console.log('[init] Students configured:', teacherStudents.map(s => s.name));
     renderTeacherGrid();
     fetchAllStudents();
     startTeacherClock();
