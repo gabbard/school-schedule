@@ -7,29 +7,89 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg:           #f0f4f8;
+      --surface:      #ffffff;
+      --surface2:     #ebf8ff;
+      --border:       #bee3f8;
+      --border-soft:  #e2e8f0;
+      --border-faint: #f7fafc;
+      --text:         #1a202c;
+      --text-muted:   #718096;
+      --text-faint:   #a0aec0;
+      --text-faintest:#cbd5e0;
+      --heading:      #2b6cb0;
+      --heading-dark: #2d3748;
+      --shadow:       rgba(0,0,0,0.08);
+      --progress-bg:  #e2e8f0;
+    }
+
+    body.dark {
+      --bg:           #0f1117;
+      --surface:      #1a1d27;
+      --surface2:     #1e2a3a;
+      --border:       #2a4a6b;
+      --border-soft:  #2d3748;
+      --border-faint: #1e2330;
+      --text:         #e2e8f0;
+      --text-muted:   #a0aec0;
+      --text-faint:   #718096;
+      --text-faintest:#4a5568;
+      --heading:      #63b3ed;
+      --heading-dark: #e2e8f0;
+      --shadow:       rgba(0,0,0,0.4);
+      --progress-bg:  #2d3748;
+    }
+
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #f0f4f8;
+      background: var(--bg);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 2rem 1rem;
-      color: #1a202c;
+      color: var(--text);
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 0.25rem;
+      width: 100%;
+      max-width: 1200px;
+      position: relative;
     }
 
     h1 {
       font-size: 1.8rem;
       font-weight: 700;
-      margin-bottom: 0.25rem;
-      color: #2b6cb0;
+      color: var(--heading);
     }
 
     .subtitle {
-      color: #718096;
+      color: var(--text-muted);
       margin-bottom: 1.5rem;
       font-size: 0.95rem;
     }
+
+    /* ── Dark mode toggle ── */
+    .dark-toggle {
+      position: absolute;
+      right: 0;
+      background: var(--surface);
+      border: 1.5px solid var(--border-soft);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 0.4rem 0.75rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .dark-toggle:hover { background: var(--border-soft); }
 
     .hidden { display: none !important; }
 
@@ -39,10 +99,10 @@
     .teacher-clock {
       text-align: center;
       font-size: 1rem;
-      color: #718096;
+      color: var(--text-muted);
       margin-bottom: 1rem;
     }
-    .teacher-clock span { font-weight: 700; color: #2d3748; }
+    .teacher-clock span { font-weight: 700; color: var(--heading-dark); }
 
     #teacher-grid {
       display: grid;
@@ -50,36 +110,31 @@
       gap: 1rem;
       width: 100%;
     }
-
-    @media (max-width: 900px) {
-      #teacher-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 500px) {
-      #teacher-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px) { #teacher-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { #teacher-grid { grid-template-columns: 1fr; } }
 
     .student-tile {
-      background: white;
+      background: var(--surface);
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px var(--shadow);
       overflow: hidden;
     }
 
     .student-tile-header {
       padding: 0.75rem 1rem;
-      background: #ebf8ff;
-      border-bottom: 1px solid #bee3f8;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
     }
 
     .student-name {
       font-weight: 700;
       font-size: 0.95rem;
-      color: #2b6cb0;
+      color: var(--heading);
       cursor: pointer;
       text-decoration: underline;
       text-underline-offset: 2px;
     }
-    .student-name:hover { color: #2c5282; }
+    .student-name:hover { opacity: 0.8; }
 
     .student-tile-body { padding: 1rem; }
 
@@ -92,35 +147,41 @@
     }
     .tile-label.green  { color: #38a169; }
     .tile-label.orange { color: #dd6b20; }
+    .tile-label.blue   { color: #3182ce; }
 
     .tile-now  { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
-    .tile-time { font-size: 0.8rem; color: #718096; margin-bottom: 0.5rem; }
+    .tile-time { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
 
     .tile-progress-wrap {
-      background: #e2e8f0;
+      background: var(--progress-bg);
       border-radius: 99px;
       height: 5px;
       overflow: hidden;
       margin-bottom: 0.25rem;
     }
     .tile-progress-fill { height: 100%; background: #48bb78; border-radius: 99px; }
-    .tile-pct { font-size: 0.75rem; color: #a0aec0; margin-bottom: 0.75rem; }
+    .tile-pct { font-size: 0.75rem; color: var(--text-faint); margin-bottom: 0.6rem; }
 
-    .tile-schedule { margin-top: 0.85rem; border-top: 1px solid #e2e8f0; padding-top: 0.75rem; }
-    .tile-schedule-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #a0aec0; margin-bottom: 0.5rem; }
-    .tile-schedule-item { display: flex; gap: 0.5rem; align-items: center; padding: 0.3rem 0; font-size: 0.8rem; border-bottom: 1px solid #f7fafc; }
+    .tile-next { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-soft); }
+    .tile-next-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #3182ce; margin-bottom: 0.2rem; }
+    .tile-next-title { font-size: 0.88rem; font-weight: 600; }
+    .tile-next-time  { font-size: 0.78rem; color: var(--text-faint); }
+
+    .tile-schedule { margin-top: 0.75rem; border-top: 1px solid var(--border-soft); padding-top: 0.75rem; }
+    .tile-schedule-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint); margin-bottom: 0.5rem; }
+    .tile-schedule-item { display: flex; gap: 0.5rem; align-items: center; padding: 0.3rem 0; font-size: 0.8rem; border-bottom: 1px solid var(--border-faint); }
     .tile-schedule-item:last-child { border-bottom: none; }
     .tile-schedule-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .tile-schedule-item.past  { color: #a0aec0; }
-    .tile-schedule-item.past .tile-schedule-dot { background: #cbd5e0; }
-    .tile-schedule-item.current { font-weight: 700; }
+    .tile-schedule-item.past     { color: var(--text-faint); }
+    .tile-schedule-item.past .tile-schedule-dot { background: var(--text-faintest); }
+    .tile-schedule-item.current  { font-weight: 700; }
     .tile-schedule-item.current .tile-schedule-dot { background: #48bb78; }
     .tile-schedule-item.upcoming .tile-schedule-dot { background: #4299e1; }
-    .tile-schedule-time { min-width: 95px; color: #718096; font-size: 0.75rem; flex-shrink: 0; }
-    .tile-schedule-item.past .tile-schedule-time { color: #cbd5e0; }
+    .tile-schedule-time { min-width: 95px; color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
+    .tile-schedule-item.past .tile-schedule-time { color: var(--text-faintest); }
 
-    .tile-error   { font-size: 0.82rem; color: #c53030; }
-    .tile-loading { font-size: 0.82rem; color: #a0aec0; }
+    .tile-error   { font-size: 0.82rem; color: #fc8181; }
+    .tile-loading { font-size: 0.82rem; color: var(--text-faint); }
 
     /* ── Student detail view ── */
     #detail-view { width: 100%; max-width: 560px; }
@@ -129,9 +190,9 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background: white;
-      border: 1.5px solid #cbd5e0;
-      color: #4a5568;
+      background: var(--surface);
+      border: 1.5px solid var(--border-soft);
+      color: var(--text-muted);
       border-radius: 8px;
       padding: 0.5rem 1rem;
       font-size: 0.88rem;
@@ -140,12 +201,12 @@
       margin-bottom: 1.25rem;
       transition: background 0.15s;
     }
-    .back-btn:hover { background: #f0f4f8; }
+    .back-btn:hover { background: var(--border-soft); }
 
     .detail-student-name {
       font-size: 1.3rem;
       font-weight: 700;
-      color: #2b6cb0;
+      color: var(--heading);
       margin-bottom: 1rem;
       text-align: center;
     }
@@ -153,24 +214,24 @@
     .clock {
       text-align: center;
       font-size: 1.1rem;
-      color: #718096;
+      color: var(--text-muted);
       margin-bottom: 1rem;
     }
-    .clock span { font-weight: 700; color: #2d3748; }
+    .clock span { font-weight: 700; color: var(--heading-dark); }
 
     .card {
-      background: white;
+      background: var(--surface);
       border-radius: 12px;
       padding: 1.25rem 1.5rem;
       margin-bottom: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px var(--shadow);
     }
     .card-label {
       font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #a0aec0;
+      color: var(--text-faint);
       margin-bottom: 0.4rem;
     }
     .card.now  { border-left: 4px solid #48bb78; }
@@ -181,22 +242,17 @@
     .card.free .card-label { color: #dd6b20; }
 
     .event-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.2rem; }
-    .event-time  { font-size: 0.88rem; color: #718096; }
+    .event-time  { font-size: 0.88rem; color: var(--text-muted); }
 
     .progress-bar-wrap {
       margin-top: 0.75rem;
-      background: #e2e8f0;
+      background: var(--progress-bg);
       border-radius: 99px;
       height: 6px;
       overflow: hidden;
     }
-    .progress-bar-fill {
-      height: 100%;
-      background: #48bb78;
-      border-radius: 99px;
-      transition: width 1s linear;
-    }
-    .progress-label { margin-top: 0.3rem; font-size: 0.78rem; color: #718096; }
+    .progress-bar-fill { height: 100%; background: #48bb78; border-radius: 99px; transition: width 1s linear; }
+    .progress-label { margin-top: 0.3rem; font-size: 0.78rem; color: var(--text-muted); }
 
     .today-list { margin-top: 0.25rem; }
     .today-item {
@@ -204,25 +260,28 @@
       align-items: center;
       gap: 0.75rem;
       padding: 0.55rem 0;
-      border-bottom: 1px solid #f7fafc;
+      border-bottom: 1px solid var(--border-faint);
       font-size: 0.88rem;
     }
     .today-item:last-child { border-bottom: none; }
-    .today-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: #cbd5e0; }
-    .today-item.past    { color: #a0aec0; }
-    .today-item.past .today-dot { background: #a0aec0; }
-    .today-item.current { font-weight: 700; }
+    .today-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-faintest); }
+    .today-item.past     { color: var(--text-faint); }
+    .today-item.past .today-dot { background: var(--text-faint); }
+    .today-item.current  { font-weight: 700; }
     .today-item.current .today-dot { background: #48bb78; }
     .today-item.upcoming .today-dot { background: #4299e1; }
-    .today-time { color: #718096; min-width: 110px; font-size: 0.82rem; }
-    .today-item.past .today-time { color: #cbd5e0; }
+    .today-time { color: var(--text-muted); min-width: 110px; font-size: 0.82rem; }
+    .today-item.past .today-time { color: var(--text-faintest); }
 
-    .no-events { text-align: center; color: #a0aec0; padding: 1.5rem; font-size: 0.95rem; }
+    .no-events { text-align: center; color: var(--text-faint); padding: 1.5rem; font-size: 0.95rem; }
   </style>
 </head>
 <body>
 
-<h1>Student Schedule</h1>
+<div class="page-header">
+  <h1>Student Schedule</h1>
+  <button class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
+</div>
 <p class="subtitle">See what students should be doing right now</p>
 
 <!-- ══ TEACHER GRID VIEW ══ -->
@@ -254,6 +313,14 @@
   let detailClockTimer    = null;
   let detailRefreshTimer  = null;
   let currentDetailIdx    = null;
+
+  // ── Dark mode ──────────────────────────────────────────
+
+  function toggleDark() {
+    const dark = document.body.classList.toggle('dark');
+    localStorage.setItem('dark', dark ? '1' : '0');
+    document.querySelector('.dark-toggle').textContent = dark ? '☀️' : '🌙';
+  }
 
   // ── Utilities ──────────────────────────────────────────
 
@@ -330,8 +397,9 @@
     const now  = new Date();
 
     grid.innerHTML = teacherStudents.map((s, i) => {
-      const todays  = s.events ? todayEvents(s.events) : null;
-      const current = todays && todays.find(e => e.start <= now && e.end > now);
+      const todays   = s.events ? todayEvents(s.events) : null;
+      const current  = todays && todays.find(e => e.start <= now && e.end > now);
+      const upcoming = todays && todays.find(e => e.start > now);
 
       let body = '';
       if (s.error) {
@@ -349,6 +417,15 @@
           <div class="tile-pct">${pct}% done &bull; ${remaining} min left</div>`;
       } else {
         body = `<div class="tile-label orange">Right Now</div><div class="tile-now">Free time</div>`;
+      }
+
+      if (upcoming && !s.error) {
+        const minsUntil = Math.ceil((upcoming.start - now) / 60000);
+        body += `<div class="tile-next">
+          <div class="tile-next-label">Up Next &bull; in ${minsUntil} min</div>
+          <div class="tile-next-title">${esc(upcoming.title)}</div>
+          <div class="tile-next-time">${fmt(upcoming.start)} &ndash; ${fmt(upcoming.end)}</div>
+        </div>`;
       }
 
       if (todays && todays.length === 0 && !s.error) {
@@ -406,7 +483,7 @@
   function renderDetail(idx) {
     const s = teacherStudents[idx];
     const now = new Date();
-    const todays  = s.events ? todayEvents(s.events) : [];
+    const todays   = s.events ? todayEvents(s.events) : [];
     const current  = todays.find(e => e.start <= now && e.end > now);
     const upcoming = todays.find(e => e.start > now);
 
@@ -465,7 +542,6 @@
     document.getElementById('detail-view').classList.remove('hidden');
     document.getElementById('detail-name').textContent = teacherStudents[idx].name;
     renderDetail(idx);
-
     clearInterval(detailRefreshTimer);
     detailRefreshTimer = setInterval(() => renderDetail(currentDetailIdx), 60000);
   }
@@ -481,6 +557,12 @@
   // ── Init ───────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', () => {
+    // Restore dark mode preference
+    if (localStorage.getItem('dark') === '1') {
+      document.body.classList.add('dark');
+      document.querySelector('.dark-toggle').textContent = '☀️';
+    }
+
     teacherStudents = DEFAULT_STUDENTS.map(e => ({ ...e, events: null, error: null }));
     renderTeacherGrid();
     fetchAllStudents();
