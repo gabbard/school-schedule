@@ -350,8 +350,9 @@
       if (line === 'END:VEVENT') {
         if (ev && ev.start && ev.end && ev.title) {
           raw_events.push(ev);
+          console.log(`[parseIcal] Parsed VEVENT: "${ev.title}" uid=${ev.uid} recurrenceId=${ev.recurrenceId} rrule=${ev.rrule} start=${ev.start} end=${ev.end}`);
         } else if (ev) {
-          console.warn('[parseIcal] Skipping incomplete event (missing start, end, or title):', ev);
+          console.warn('[parseIcal] Skipping incomplete event (missing start, end, or title):', JSON.stringify(ev));
         }
         ev = null; continue;
       }
@@ -363,30 +364,38 @@
       else if (line.startsWith('LOCATION:'))      ev.location     = line.slice(9);
       else if (line.startsWith('RRULE:'))         ev.rrule        = line.slice(6);
       else if (line.startsWith('UID:'))           ev.uid          = line.slice(4).trim();
-      else if (line.startsWith('RECURRENCE-ID'))  ev.recurrenceId = parseICalDate(line.split(':').slice(1).join(':'));
+      else if (line.startsWith('RECURRENCE-ID'))  { ev.recurrenceId = parseICalDate(line.split(':').slice(1).join(':')); console.log(`[parseIcal] Found RECURRENCE-ID line: "${line}" → ${ev.recurrenceId}`); }
       else if (line.startsWith('EXDATE'))         ev.exdates      = [...(ev.exdates||[]), ...line.split(':').slice(1).join(':').split(',').map(parseICalDate)];
     }
 
     const now = new Date();
     const windowStart = new Date(now); windowStart.setHours(0,0,0,0);
     const windowEnd   = new Date(now); windowEnd.setHours(23,59,59,999);
+    console.log(`[parseIcal] Window: ${windowStart} → ${windowEnd}`);
+    console.log(`[parseIcal] Total raw_events parsed: ${raw_events.length}`);
 
     // Separate override instances (have RECURRENCE-ID) from base events
     const overrides = raw_events.filter(e => e.recurrenceId);
     const baseEvents = raw_events.filter(e => !e.recurrenceId);
+    console.log(`[parseIcal] Base events: ${baseEvents.length}, Overrides (RECURRENCE-ID): ${overrides.length}`);
+    overrides.forEach(o => console.log(`[parseIcal] Override: "${o.title}" uid=${o.uid} recurrenceId=${o.recurrenceId} start=${o.start}`));
 
     // Key: uid + date string of the overridden occurrence
     const overriddenKeys = new Set(overrides.map(o => {
       const d = o.recurrenceId;
       return `${o.uid}|${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
     }));
+    console.log(`[parseIcal] Overridden keys:`, [...overriddenKeys]);
 
     const events = [];
     for (const base of baseEvents) {
       if (!base.rrule) {
         // Non-recurring: include if today and not overridden
         const key = `${base.uid}|${base.start.getFullYear()}-${base.start.getMonth()}-${base.start.getDate()}`;
-        if (!overriddenKeys.has(key)) events.push(base);
+        const inWindow = base.start >= windowStart && base.start <= windowEnd;
+        const blocked = overriddenKeys.has(key);
+        console.log(`[parseIcal] Non-recurring "${base.title}": inWindow=${inWindow} overridden=${blocked} key=${key}`);
+        if (inWindow && !blocked) events.push(base);
         continue;
       }
 
@@ -435,7 +444,11 @@
           if (count !== null && generated >= count) continue;
           if (c < base.start) continue;
           const occKey = `${base.uid}|${c.getFullYear()}-${c.getMonth()}-${c.getDate()}`;
-          if (!isExcluded(c) && c >= windowStart && c <= windowEnd && !overriddenKeys.has(occKey)) {
+          const inWindow = c >= windowStart && c <= windowEnd;
+          const excluded = isExcluded(c);
+          const overridden = overriddenKeys.has(occKey);
+          if (inWindow) console.log(`[parseIcal] Recurring occ "${base.title}" @ ${c}: excluded=${excluded} overridden=${overridden} key=${occKey}`);
+          if (!excluded && inWindow && !overridden) {
             events.push({...base, start: c, end: new Date(c.getTime() + duration)});
           }
           if (c >= base.start) generated++;
@@ -451,9 +464,9 @@
 
     // Add override instances that fall today
     for (const o of overrides) {
-      if (o.start >= windowStart && o.start <= windowEnd) {
-        events.push(o);
-      }
+      const inWindow = o.start >= windowStart && o.start <= windowEnd;
+      console.log(`[parseIcal] Override instance "${o.title}" start=${o.start}: inWindow=${inWindow}`);
+      if (inWindow) events.push(o);
     }
 
     console.log(`[parseIcal] Found ${events.length} valid events:`, events);
