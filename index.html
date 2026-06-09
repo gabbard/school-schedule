@@ -357,21 +357,38 @@
       }
       if (!ev) continue;
       if (line.startsWith('DTSTART')) ev.start = parseICalDate(line.split(':').slice(1).join(':'));
-      else if (line.startsWith('DTEND'))        ev.end         = parseICalDate(line.split(':').slice(1).join(':'));
-      else if (line.startsWith('SUMMARY:'))     ev.title       = line.slice(8).replace(/\\,/g,',').replace(/\\n/g,'\n');
-      else if (line.startsWith('DESCRIPTION:')) ev.description = line.slice(12).replace(/\\,/g,',').replace(/\\n/g,'\n');
-      else if (line.startsWith('LOCATION:'))    ev.location    = line.slice(9);
-      else if (line.startsWith('RRULE:'))       ev.rrule       = line.slice(6);
-      else if (line.startsWith('EXDATE'))       ev.exdates     = [...(ev.exdates||[]), ...line.split(':').slice(1).join(':').split(',').map(parseICalDate)];
+      else if (line.startsWith('DTEND'))          ev.end          = parseICalDate(line.split(':').slice(1).join(':'));
+      else if (line.startsWith('SUMMARY:'))       ev.title        = line.slice(8).replace(/\\,/g,',').replace(/\\n/g,'\n');
+      else if (line.startsWith('DESCRIPTION:'))   ev.description  = line.slice(12).replace(/\\,/g,',').replace(/\\n/g,'\n');
+      else if (line.startsWith('LOCATION:'))      ev.location     = line.slice(9);
+      else if (line.startsWith('RRULE:'))         ev.rrule        = line.slice(6);
+      else if (line.startsWith('UID:'))           ev.uid          = line.slice(4).trim();
+      else if (line.startsWith('RECURRENCE-ID'))  ev.recurrenceId = parseICalDate(line.split(':').slice(1).join(':'));
+      else if (line.startsWith('EXDATE'))         ev.exdates      = [...(ev.exdates||[]), ...line.split(':').slice(1).join(':').split(',').map(parseICalDate)];
     }
 
     const now = new Date();
     const windowStart = new Date(now); windowStart.setHours(0,0,0,0);
     const windowEnd   = new Date(now); windowEnd.setHours(23,59,59,999);
 
+    // Separate override instances (have RECURRENCE-ID) from base events
+    const overrides = raw_events.filter(e => e.recurrenceId);
+    const baseEvents = raw_events.filter(e => !e.recurrenceId);
+
+    // Key: uid + date string of the overridden occurrence
+    const overriddenKeys = new Set(overrides.map(o => {
+      const d = o.recurrenceId;
+      return `${o.uid}|${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    }));
+
     const events = [];
-    for (const base of raw_events) {
-      if (!base.rrule) { events.push(base); continue; }
+    for (const base of baseEvents) {
+      if (!base.rrule) {
+        // Non-recurring: include if today and not overridden
+        const key = `${base.uid}|${base.start.getFullYear()}-${base.start.getMonth()}-${base.start.getDate()}`;
+        if (!overriddenKeys.has(key)) events.push(base);
+        continue;
+      }
 
       const duration = base.end - base.start;
       const parts = Object.fromEntries(base.rrule.split(';').map(p => p.split('=')));
@@ -417,7 +434,8 @@
           if (until && c > until) continue;
           if (count !== null && generated >= count) continue;
           if (c < base.start) continue;
-          if (!isExcluded(c) && c >= windowStart && c <= windowEnd) {
+          const occKey = `${base.uid}|${c.getFullYear()}-${c.getMonth()}-${c.getDate()}`;
+          if (!isExcluded(c) && c >= windowStart && c <= windowEnd && !overriddenKeys.has(occKey)) {
             events.push({...base, start: c, end: new Date(c.getTime() + duration)});
           }
           if (c >= base.start) generated++;
@@ -428,6 +446,13 @@
         else if (freq === 'MONTHLY') cursor.setMonth(cursor.getMonth() + interval);
         else if (freq === 'YEARLY')  cursor.setFullYear(cursor.getFullYear() + interval);
         else break;
+      }
+    }
+
+    // Add override instances that fall today
+    for (const o of overrides) {
+      if (o.start >= windowStart && o.start <= windowEnd) {
+        events.push(o);
       }
     }
 
