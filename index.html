@@ -419,9 +419,12 @@
       let generated = 0;
       const maxIter = 2000;
       for (let iter = 0; iter < maxIter; iter++) {
+        const breakAnchor = (byDay && freq === 'WEEKLY')
+          ? new Date(cursor.getTime() - cursor.getDay() * 86400000)  // Sunday of cursor's week
+          : cursor;
         if (until && cursor > until) break;
         if (count !== null && generated >= count) break;
-        if (cursor > windowEnd) break;
+        if (breakAnchor > windowEnd) break;
 
         const candidates = [];
         if (byDay && (freq === 'WEEKLY' || freq === 'DAILY')) {
